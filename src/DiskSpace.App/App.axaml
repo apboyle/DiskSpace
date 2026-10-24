@@ -1,0 +1,40 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DiskSpace.App.App" RequestedThemeVariant="Dark">
+  <Application.Styles>
+    <FluentTheme />
+    <Style Selector="Window">
+      <Setter Property="FontFamily" Value="Inter, Segoe UI, Helvetica Neue, DejaVu Sans" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Background" Value="#10151E" />
+      <Setter Property="Foreground" Value="#E9EEF5" />
+    </Style>
+    <Style Selector="TextBlock.muted"><Setter Property="Foreground" Value="#95A4B8" /></Style>
+    <Style Selector="TextBlock.eyebrow">
+      <Setter Property="FontSize" Value="10" /><Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="LetterSpacing" Value="1.5" /><Setter Property="Foreground" Value="#95A4B8" />
+    </Style>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="#18212D" /><Setter Property="CornerRadius" Value="10" />
+      <Setter Property="BorderBrush" Value="#2A3545" /><Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#67E8C3" /><Setter Property="Foreground" Value="#10231F" />
+      <Setter Property="FontWeight" Value="SemiBold" /><Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="CornerRadius" Value="6" /><Setter Property="Padding" Value="16,11" />
+    </Style>
+    <Style Selector="Button.expander">
+      <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" /><Setter Property="Width" Value="24" />
+      <Setter Property="Height" Value="32" /><Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ListBox.tree">
+      <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="ListBox.tree ListBoxItem">
+      <Setter Property="Padding" Value="8,0" /><Setter Property="MinHeight" Value="39" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    </Style>
+  </Application.Styles>
+</Application>

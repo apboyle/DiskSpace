@@ -1,0 +1,37 @@
+name: Build and test
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            runtimes: win-x64,win-arm64
+          - os: macos-latest
+            runtimes: osx-arm64,osx-x64
+          - os: ubuntu-latest
+            runtimes: linux-x64,linux-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Test shared engine, native adapters, UI and scale
+        run: dotnet test DiskSpace.slnx -c Release --logger trx --results-directory artifacts/test-results
+      - name: Publish portable packages
+        shell: pwsh
+        run: ./scripts/Publish.ps1 -Runtime ('${{ matrix.runtimes }}'.Split(','))
+      - name: Verify Linux archive executable permissions
+        if: runner.os == 'Linux'
+        run: |
+          unzip -q artifacts/packages/DiskSpace-linux-x64.zip -d artifacts/package-check
+          test -x artifacts/package-check/DiskSpace/DiskSpace.App
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: diskspace-${{ matrix.os }}
+          path: |
+            artifacts/packages/*.zip
+            artifacts/test-results/*.trx

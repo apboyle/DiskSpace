@@ -1,0 +1,121 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:DiskSpace.App" xmlns:core="using:DiskSpace.Core"
+        x:Class="DiskSpace.App.MainWindow" x:DataType="local:MainViewModel"
+        Title="DiskSpace" Width="1360" Height="880" MinWidth="1000" MinHeight="660">
+  <Window.Resources><local:IndentConverter x:Key="Indent" /></Window.Resources>
+  <Grid ColumnDefinitions="260,*">
+    <Border Background="#151C27" BorderBrush="#2A3545" BorderThickness="0,0,1,0" Padding="22,28">
+      <Grid RowDefinitions="Auto,Auto,Auto,* ,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,42">
+          <Border Background="#67E8C3" Width="30" Height="30" CornerRadius="8">
+            <TextBlock Text="◉" Foreground="#10231F" FontSize="23" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <TextBlock Text="DiskSpace" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Spacing="12">
+          <TextBlock Text="SCAN TARGET" Classes="eyebrow" />
+          <ComboBox ItemsSource="{Binding Volumes}" SelectedItem="{Binding SelectedVolume}" HorizontalAlignment="Stretch" MaxDropDownHeight="320">
+            <ComboBox.ItemTemplate><DataTemplate x:DataType="core:VolumeInfo"><TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" /></DataTemplate></ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBlock Text="{Binding VolumeDescription}" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+          <TextBlock Text="OR CHOOSE A FOLDER" Classes="eyebrow" Margin="0,12,0,0" />
+          <TextBox Text="{Binding SelectedPath}" PlaceholderText="Drive or folder path" FontSize="12" />
+          <Button Content="Browse folders…" Click="BrowseClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+          <Button Content="{Binding ScanButtonText}" Classes="primary" Click="ScanClicked" IsEnabled="{Binding CanScan}" HorizontalAlignment="Stretch" Margin="0,10,0,0" />
+          <Button Content="Cancel scan" Click="CancelClicked" IsEnabled="{Binding IsScanning}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+        </StackPanel>
+        <Border Grid.Row="2" Classes="card" Padding="14" Margin="0,26,0,0">
+          <StackPanel Spacing="8">
+            <TextBlock Text="The bigger picture" FontWeight="SemiBold" />
+            <TextBlock Text="Folders include everything beneath them. Every percentage compares an item with the whole scan." Classes="muted" FontSize="12" TextWrapping="Wrap" LineHeight="19" />
+          </StackPanel>
+        </Border>
+        <StackPanel Grid.Row="4" Spacing="8">
+          <TextBlock Text="READ-ONLY ANALYSIS" Classes="eyebrow" Foreground="#67E8C3" />
+          <TextBlock Text="Files are never changed. Linked folders and other mounted volumes are not followed." Classes="muted" FontSize="11" TextWrapping="Wrap" LineHeight="18" />
+        </StackPanel>
+      </Grid>
+    </Border>
+    <Grid Grid.Column="1" Margin="30,28,30,20" RowDefinitions="Auto,Auto,*,Auto">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="7">
+          <TextBlock Text="STORAGE EXPLORER" Classes="eyebrow" Foreground="#67E8C3" />
+          <TextBlock Text="See where your space goes." FontSize="28" FontWeight="SemiBold" />
+          <TextBlock Text="{Binding MeasurementNote}" Classes="muted" FontSize="12" />
+        </StackPanel>
+        <Border Grid.Column="1" Classes="card" Padding="12,8" VerticalAlignment="Top" Margin="12,4,0,0">
+          <TextBlock Text="{Binding Status}" FontSize="11" Foreground="#67E8C3" />
+        </Border>
+      </Grid>
+      <Grid Grid.Row="1" ColumnDefinitions="2*,*,*" Margin="0,26,0,22">
+        <Border Classes="card" Padding="20,17" Margin="0,0,12,0"><StackPanel Spacing="7">
+          <TextBlock Text="SPACE ON DISK" Classes="eyebrow" /><TextBlock Text="{Binding Size}" FontSize="30" FontWeight="SemiBold" />
+        </StackPanel></Border>
+        <Border Grid.Column="1" Classes="card" Padding="20,17" Margin="0,0,12,0"><StackPanel Spacing="7">
+          <TextBlock Text="ENTRIES" Classes="eyebrow" /><TextBlock Text="{Binding Entries}" FontSize="30" FontWeight="SemiBold" />
+        </StackPanel></Border>
+        <Border Grid.Column="2" Classes="card" Padding="20,17"><StackPanel Spacing="7">
+          <TextBlock Text="ELAPSED" Classes="eyebrow" /><TextBlock Text="{Binding Elapsed}" FontSize="30" FontWeight="SemiBold" />
+        </StackPanel></Border>
+      </Grid>
+      <Border Grid.Row="2" Classes="card" Padding="12,8,12,12">
+        <Grid>
+          <TabControl IsVisible="{Binding HasResults}">
+            <TabItem Header="Space explorer">
+              <Grid RowDefinitions="Auto,*,Auto">
+                <Grid ColumnDefinitions="*,135,160,135" Margin="8,14,8,9">
+                  <TextBlock Text="NAME ↓" Classes="eyebrow" />
+                  <TextBlock Grid.Column="1" Text="SPACE ON DISK" Classes="eyebrow" HorizontalAlignment="Right" Margin="0,0,18,0" />
+                  <TextBlock Grid.Column="2" Text="% OF SCAN" Classes="eyebrow" Margin="12,0,0,0" />
+                  <TextBlock Grid.Column="3" Text="STATUS" Classes="eyebrow" Margin="12,0,0,0" />
+                </Grid>
+                <ListBox x:Name="TreeList" Grid.Row="1" Classes="tree" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}"
+                         KeyDown="TreeKeyDown" DoubleTapped="TreeDoubleTapped" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                  <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="core:TreeRow">
+                      <Grid ColumnDefinitions="*,135,160,135" Height="39">
+                        <Grid ColumnDefinitions="24,*" Margin="{Binding Indent, Converter={StaticResource Indent}}" VerticalAlignment="Center" ClipToBounds="True">
+                          <Button Classes="expander" Content="{Binding Glyph}" Click="ExpanderClicked" Focusable="False" />
+                          <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Name}" />
+                        </Grid>
+                        <TextBlock Grid.Column="1" Text="{Binding SizeText}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,18,0" FontWeight="Medium" />
+                        <Grid Grid.Column="2" ColumnDefinitions="70,55" Margin="12,0,12,0">
+                          <ProgressBar Minimum="0" Maximum="100" Value="{Binding Percentage}" Width="70" MinWidth="0" Height="5" Foreground="#67E8C3" Background="#2A3545" VerticalAlignment="Center" />
+                          <TextBlock Grid.Column="1" Text="{Binding PercentageText}" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="11" Classes="muted" />
+                        </Grid>
+                        <TextBlock Grid.Column="3" Text="{Binding Status}" FontSize="10" Classes="muted" VerticalAlignment="Center" Margin="12,0,0,0" TextTrimming="CharacterEllipsis" />
+                      </Grid>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+                <Border Grid.Row="2" BorderBrush="#2A3545" BorderThickness="0,1,0,0" Padding="8,10,8,0">
+                  <TextBlock Text="{Binding SelectionDetails}" TextWrapping="Wrap" FontSize="11" Classes="muted" MaxHeight="90" />
+                </Border>
+              </Grid>
+            </TabItem>
+            <TabItem Header="{Binding IssueSummary}">
+              <Grid RowDefinitions="Auto,*">
+                <TextBlock Text="Unreadable entries remain in the tree. Showing up to 1,000 issues; totals include only measured storage." TextWrapping="Wrap" Classes="muted" Margin="8,15" />
+                <ListBox Grid.Row="1" ItemsSource="{Binding Issues}" Background="Transparent">
+                  <ListBox.ItemTemplate><DataTemplate x:DataType="core:ScanIssue">
+                    <StackPanel Margin="0,5" Spacing="4"><TextBlock Text="{Binding Path}" TextWrapping="Wrap" /><TextBlock Text="{Binding Reason}" Classes="muted" FontSize="11" TextWrapping="Wrap" /></StackPanel>
+                  </DataTemplate></ListBox.ItemTemplate>
+                </ListBox>
+              </Grid>
+            </TabItem>
+          </TabControl>
+          <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14" MaxWidth="400">
+            <TextBlock Text="◉" FontSize="60" Foreground="#67E8C3" HorizontalAlignment="Center" />
+            <TextBlock Text="A clearer view of your drive" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" />
+            <TextBlock Text="Choose a drive or folder, then scan to find the files and folders taking up the most space." TextWrapping="Wrap" TextAlignment="Center" Classes="muted" LineHeight="22" />
+          </StackPanel>
+        </Grid>
+      </Border>
+      <StackPanel Grid.Row="3" Spacing="5" Margin="0,12,0,0">
+        <TextBlock Text="{Binding CurrentPath}" FontSize="11" Classes="muted" TextTrimming="CharacterEllipsis" />
+        <TextBlock Text="Filesystem-reported allocation may differ from drive usage because of inaccessible data, snapshots, shared blocks and filesystem overhead." FontSize="10" Foreground="#738399" TextWrapping="Wrap" />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

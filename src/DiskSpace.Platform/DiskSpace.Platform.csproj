@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../DiskSpace.Core/DiskSpace.Core.csproj" />
+  </ItemGroup>
+</Project>
